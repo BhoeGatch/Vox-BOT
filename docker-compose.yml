@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  voxbot:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG_MODE=false
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Optional: Add PostgreSQL for data storage
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: voxbot
+      POSTGRES_USER: voxbot
+      POSTGRES_PASSWORD: voxbot_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
