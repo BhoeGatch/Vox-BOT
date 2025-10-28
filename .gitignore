@@ -194,6 +194,11 @@ config_local.py
 secrets.json
 credentials.json
 
+# Security and validation (keep private)
+validation.py
+exception_handler.py
+production_logger.py
+
 # IDE
 .idea/
 *.sublime-*
